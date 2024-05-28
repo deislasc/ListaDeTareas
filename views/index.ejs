@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <link rel="stylesheet" href="/css/styles.css"> <!-- Ruta corregida -->
+</head>
+<body>
+  <div class="container">
+    <h1>Listado de Tareas</h1>
+    <form action="/tasks" method="POST">
+      <input type="text" name="name" placeholder="Escribe una nueva tarea" required>
+      <button type="submit">Agregar</button>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th>Tarea</th>
+          <th>Finalizar</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tasks.forEach(task => { %>
+          <tr>
+            <td><%= task.name %></td>
+            <td>
+              <form class="inline-form" action="/tasks/<%= task._id %>/complete" method="POST">
+                <button class="complete-btn" type="submit"><%= task.completed ? "✔" : "❌" %></button>
+              </form>
+            </td>
+            <td>
+              <form class="inline-form" action="/tasks/<%= task._id %>/delete" method="POST">
+                <button class="delete-btn" type="submit">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('form.inline-form[action*="complete"]').on('submit', function(event) {
+        event.preventDefault();
+        $.post($(this).attr('action'), $(this).serialize(), function() {
+          location.reload();
+        });
+      });
+
+      $('form.inline-form[action*="delete"]').on('submit', function(event) {
+        event.preventDefault();
+        $.post($(this).attr('action'), $(this).serialize(), function() {
+          location.reload();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
