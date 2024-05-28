@@ -47,8 +47,19 @@ app.post('/api/tasks/:id/complete', async (req, res) => {
 
 // Eliminar tarea
 app.post('/api/tasks/:id/delete', async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.redirect('/');
+  try {
+    const result = await Task.findByIdAndDelete(req.params.id);
+    if (result) {
+      console.log('Elemento eliminado correctamente:', req.params.id);
+      res.status(200).json({ message: 'Elemento eliminado correctamente' });
+    } else {
+      console.error('Tarea no encontrada para eliminar:', req.params.id);
+      res.status(404).json({ error: 'Tarea no encontrada para eliminar' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar el elemento:', error);
+    res.status(500).json({ error: 'Error al eliminar el elemento' });
+  }
 });
 
 // Consultar todas las tareas
