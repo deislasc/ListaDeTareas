@@ -9,14 +9,27 @@
 <body>
   <div class="container">
     <h1>Listado de Tareas</h1>
-    <form action="/tasks" method="POST">
-      <input type="text" name="name" placeholder="Escribe una nueva tarea" required>
+    <form action="/api/tasks/new" method="POST">
+      <div class="form-group">
+        <label for="taskName">Nueva Tarea</label>
+        <input type="text" id="taskName" name="name" placeholder="Escribe una nueva tarea" required>
+      </div>
+      <div class="form-group">
+        <label for="startDate">Fecha de Inicio</label>
+        <input type="date" id="startDate" name="startDate" required>
+      </div>
+      <div class="form-group">
+        <label for="endDate">Fecha de Fin</label>
+        <input type="date" id="endDate" name="endDate" required>
+      </div>
       <button type="submit">Agregar</button>
     </form>
     <table>
       <thead>
         <tr>
-          <th>Tarea</th>
+          <th>Nombre de Tarea</th>
+          <th>Fecha de Inicio</th>
+          <th>Fecha de Fin</th>
           <th>Finalizar</th>
           <th>Eliminar</th>
         </tr>
@@ -25,13 +38,17 @@
         <% tasks.forEach(task => { %>
           <tr>
             <td><%= task.name %></td>
-            <td>
-              <form class="inline-form" action="/tasks/<%= task._id %>/complete" method="POST">
+            <td><%= new Date(task.startDate).toLocaleDateString() %></td>
+            <td><%= new Date(task.endDate).toLocaleDateString() %></td>
+            <td class="centered-cell">
+              <!-- Formulario para marcar una tarea como completada -->
+              <form class="inline-form" action="/api/tasks/<%= task._id %>/complete" method="POST">
                 <button class="complete-btn" type="submit"><%= task.completed ? "✔" : "❌" %></button>
               </form>
             </td>
-            <td>
-              <form class="inline-form" action="/tasks/<%= task._id %>/delete" method="POST">
+            <td class="centered-cell">
+              <!-- Formulario para eliminar una tarea -->
+              <form class="inline-form" action="/api/tasks/<%= task._id %>/delete" method="POST">
                 <button class="delete-btn" type="submit">Eliminar</button>
               </form>
             </td>
@@ -43,6 +60,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
+      // Enviar solicitud para marcar una tarea como completada
       $('form.inline-form[action*="complete"]').on('submit', function(event) {
         event.preventDefault();
         $.post($(this).attr('action'), $(this).serialize(), function() {
@@ -50,6 +68,7 @@
         });
       });
 
+      // Enviar solicitud para eliminar una tarea
       $('form.inline-form[action*="delete"]').on('submit', function(event) {
         event.preventDefault();
         $.post($(this).attr('action'), $(this).serialize(), function() {

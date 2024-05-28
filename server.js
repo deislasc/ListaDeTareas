@@ -24,73 +24,57 @@ app.get('/', async (req, res) => {
 });
 
 // Crear tarea
-app.post('/tasks', async (req, res) => {
+app.post('/api/tasks/new', async (req, res) => {
   const task = new Task({
     name: req.body.name,
     completed: false,
+    startDate: new Date(req.body.startDate),
+    endDate: new Date(req.body.endDate)
   });
   await task.save();
   res.redirect('/');
 });
 
-// Marcar tarea como completada
+// Actualizar tarea (marcar como completada)
 app.post('/api/tasks/:id/complete', async (req, res) => {
-    try {
-      const task = await Task.findById(req.params.id);
-      if (!task) {
-        return res.status(404).json({ error: 'Tarea no encontrada' });
-      }
-      task.completed = !task.completed;
-      await task.save();
-      res.json(task);
-    } catch (error) {
-      console.error('Error al marcar tarea como completada:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
-  
-  // Eliminar tarea
-  app.delete('/api/tasks/:id', async (req, res) => {
-    try {
-      const task = await Task.findById(req.params.id);
-      if (!task) {
-        return res.status(404).json({ error: 'Tarea no encontrada' });
-      }
-      await Task.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Tarea eliminada exitosamente' });
-    } catch (error) {
-      console.error('Error al eliminar tarea:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
-  
+  const task = await Task.findById(req.params.id);
+  if (task) {
+    task.completed = !task.completed;
+    await task.save();
+  }
+  res.redirect('/');
+});
 
-// Agregar una ruta para consultar todas las tareas (GET)
+// Eliminar tarea
+app.post('/api/tasks/:id/delete', async (req, res) => {
+  await Task.findByIdAndDelete(req.params.id);
+  res.redirect('/');
+});
+
+// Consultar todas las tareas
 app.get('/api/tasks', async (req, res) => {
-    try {
-      const tasks = await Task.find();
-      res.json(tasks);
-    } catch (error) {
-      console.error('Error al obtener las tareas:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
-    }
-  });
+  try {
+    const tasks = await Task.find();
+    res.json(tasks);
+  } catch (error) {
+    console.error('Error al obtener las tareas:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 
-  // Consultar una sola tarea por ID
+// Consultar una sola tarea por ID
 app.get('/api/tasks/:id', async (req, res) => {
-    try {
-      const task = await Task.findById(req.params.id);
-      if (!task) {
-        return res.status(404).json({ error: 'Tarea no encontrada' });
-      }
-      res.json(task);
-    } catch (error) {
-      console.error('Error al obtener tarea por ID:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ error: 'Tarea no encontrada' });
     }
-  });
-  
-  
+    res.json(task);
+  } catch (error) {
+    console.error('Error al obtener tarea por ID:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 
 // Definir el puerto
 const port = 3000;
