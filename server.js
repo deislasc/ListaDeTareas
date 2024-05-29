@@ -5,9 +5,11 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // Conectar a MongoDB
-mongoose.connect('mongodb://localhost/todolist', { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost/todolist';
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado a MongoDB'))
   .catch(err => console.error('No se pudo conectar a MongoDB', err));
+
 
 // Configurar middleware
 app.use(bodyParser.urlencoded({ extended: true }));
